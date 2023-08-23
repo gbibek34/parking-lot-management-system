@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Parking Lot Management System</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+  <nav class="navbar">
+    <h1>Parking Lot Management System</h1>
+    <ul class="nav-links">
+      <li>
+        <a href="/">Dashboard</a>
+      </li>
+    </ul>
+  </nav>
+  <main>
+    <div class="container">
+      <div class="details">
+        <div class="total-vehicles">Total Vehicles<span id="total-vehicles">10</span></div>
+        <div class="slots-remaining">Slots Remaining<span id="slots-remaining">5</span></div>
+        <div class="add-new">
+          <form id="add-form">
+            <label for="vehicle_num">Vehicle Number:</label>
+            <input type="text" name="vehicle_num" id="vehicle_num" required />
+            <label for="owner_num">Contact No:</label>
+            <input type="text" name="owner_num" id="owner_num" required />
+            <label for="entry_time">Entry Time:</label>
+            <input type="time" name="entry_time" id="entry_time" required />
+          </form>
+          <button class="add-btn" id="add_btn">Park Vehicle</button>
+        </div>
+      </div>
+      <div class="data-table">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Vehicle Number</th>
+              <th>Contact No</th>
+              <th>Entry Time</th>
+              <th>Exit Time</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+  <!-- Axios CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"
+    integrity="sha512-uMtXmF28A2Ab/JJO2t/vYhlaa/3ahUOgj1Zf27M5rOo8/+fcTUVH0/E0ll68njmjrLqOBjXM3V9NiPFL5ywWPQ=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script>
+    const allData = axios.get("/vehicles").then((vehicles) => {
+      var tableData = vehicles.data;
+      var totalSlots = 100
+      var table = document.getElementById("table-body");
+      var totalVehicles = document.getElementById("total-vehicles")
+      var slotsRemaining = document.getElementById("slots-remaining")
+      var parked = 0
+      for (var i = 0; i < tableData.length; i++) {
+        var row = document.createElement("tr");
+        const uniqueId = `row-${i}`;
+        row.innerHTML = `
+      <td>${tableData[i].id}</td>
+      <td>${tableData[i].vehicle_num}</td>
+      <td>${tableData[i].owner_num}</td>
+      <td>${tableData[i].entry_time}</td>
+      <td class="exit-time">
+        <div class="exit-data">
+          ${tableData[i].exit_time == null ? "Parked" : tableData[i].exit_time}
+        </div>
+        <form class="update-form" style="display:none">
+          <input type="time" name="exit_time" id="exit_time" required />
+          <button type="button" class="save-btn">Save</button>
+        </form>
+      </td>
+      <td>
+        <button class="edit-btn" id="edit_btn_${i}" data-id="${tableData[i].id}" style="display:none">Edit</button>
+        <button class="delete-btn" id="delete_btn_${i}" data-id="${tableData[i].id}">Delete</button>
+        
+      </td>
+    `;
+        table.appendChild(row);
+
+        // Event listeners for editing
+        let editButton = document.getElementById(`edit_btn_${i}`);
+        let saveButton = row.querySelector(".save-btn");
+        let editForm = row.querySelector(".update-form");
+        let exitData = row.querySelector(".exit-data");
+        let exit_time_cont = editForm.querySelector("input[name='exit_time']");
+
+        if (tableData[i].exit_time == null) {
+          editButton.style.display = "block"
+          parked = parked + 1
+        }
+        totalVehicles.innerHTML = parked
+        slotsRemaining.innerHTML = totalSlots - parked
+
+
+
+        // Edit Button Handler
+        editButton.addEventListener("click", () => {
+          if (editForm.style.display === "block") {
+            editForm.style.display = "none";
+            exitData.style.display = "block";
+          } else {
+            editForm.style.display = "block";
+            exitData.style.display = "none";
+          }
+          let idToEdit = editButton.getAttribute("data-id");
+          saveButton.addEventListener("click", () => {
+            const exit_time = exit_time_cont.value;
+            console.log("Submitting Data", idToEdit, exit_time)
+            axios.put(`/vehicles/${idToEdit}`, { exit_time }).then(() => {
+              editForm.reset()
+              alert("Exit Time Added");
+              window.location.reload();
+            }).catch((err) => {
+              console.log(err);
+            })
+          })
+        });
+
+        // Delete button handler
+        const deleteButton = document.getElementById(`delete_btn_${i}`);
+        deleteButton.addEventListener("click", () => {
+          const idToDelete = deleteButton.getAttribute("data-id");
+          axios.delete(`/vehicles/${idToDelete}`).then(() => {
+            alert("Data Removed");
+            window.location.reload();
+          }).catch((err) => {
+            console.log(err);
+          })
+        });
+      }
+    });
+
+    //Vehicle Add Handler
+    let addButton = document.getElementById("add_btn");
+    addButton.addEventListener("click", () => {
+      let form = document.getElementById("add-form");
+      let vehicle_num = document.getElementById("vehicle_num").value;
+      let owner_num = document.getElementById("owner_num").value;
+      let entry_time = document.getElementById("entry_time").value;
+      console.log("Submitting Data", vehicle_num, owner_num, entry_time);
+      axios
+        .post("/vehicles", { vehicle_num, owner_num, entry_time })
+        .then((vehicle) => {
+          form.reset();
+          alert("Vechile Registered");
+          window.location.reload();
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    });
+  </script>
+</body>
+
+</html>

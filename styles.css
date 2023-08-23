@@ -1,0 +1,141 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-family: "Inter", sans-serif;
+}
+
+.navbar {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    justify-content: space-around;
+
+    height: 80px;
+
+    background: #e4e4e4;
+}
+
+.nav-links {
+    display: flex;
+    flex-direction: row;
+}
+
+.nav-links li {
+    padding: 5px 20px;
+
+    list-style: none;
+
+    cursor: pointer;
+}
+
+.nav-links li a {
+    text-decoration: none;
+
+    color: #000;
+}
+
+.nav-links li a:hover {
+    color: #555;
+}
+
+.container {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+
+    padding: 20px;
+}
+
+.details {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+
+    width: 100%;
+    padding: 0 20px 20px;
+}
+
+.details div {
+    font-weight: bold;
+
+    margin: 0px 10px;
+    padding: 20px;
+
+    color: #FFF;
+    border-radius: 8px;
+    background-color: #FF6969;
+}
+
+.total-vehicles,
+.slots-remaining {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+
+    justify-items: center;
+}
+
+.add-new {
+    display: flex;
+    flex-direction: row;
+}
+
+.data-table {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+
+    width: 100%;
+
+    border-radius: 12px;
+    background-color: #FFF5E0;
+}
+
+table,
+th,
+td {
+    padding: 20px 40px;
+}
+
+input {
+    padding: 10px;
+}
+
+button {
+    font-family: "Inter", sans-serif;
+
+    width: 100%;
+    margin: 2.5px;
+    padding: 10px 40px;
+
+    cursor: pointer;
+
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+}
+
+.add-btn {
+    width: auto;
+
+    color: #000;
+    background: #FFF5E0;
+}
+
+.edit-btn {
+    background: cadetblue;
+}
+
+.save-btn {
+    width: 50%;
+
+    background-color: cadetblue;
+}
+
+.delete-btn {
+    background: rgb(160, 95, 95);
+}
